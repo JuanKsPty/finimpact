@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="476.0" prefWidth="350.0" spacing="20.0" style="-fx-background-color: #ECEFF4;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.juank.utp.finimpact.controller.LoginController">
+   <children>
+      <VBox alignment="CENTER" spacing="10.0">
+         <children>
+            <Label text="Iniciar Sesión" textAlignment="CENTER" textFill="#2E3440">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label text="FinImpact" textAlignment="CENTER" textFill="#5E81AC">
+               <font>
+                  <Font name="System Bold" size="16.0" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
+
+      <VBox alignment="CENTER" maxWidth="280.0" spacing="15.0">
+         <children>
+            <VBox spacing="5.0">
+               <children>
+                  <Label text="Email:" textFill="#4C566A">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="txtEmail" prefHeight="35.0" promptText="usuario@finimpact.com" style="-fx-background-radius: 5; -fx-border-radius: 5;">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </TextField>
+                  <Label fx:id="lblEmailError" textFill="#BF616A" visible="false">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+
+            <VBox spacing="5.0">
+               <children>
+                  <Label text="Contraseña:" textFill="#4C566A">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <PasswordField fx:id="txtPassword" prefHeight="35.0" promptText="Ingresa tu contraseña" style="-fx-background-radius: 5; -fx-border-radius: 5;">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </PasswordField>
+                  <Label fx:id="lblPasswordError" textFill="#BF616A" visible="false">
+                     <font>
+                        <Font size="11.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+
+            <Label fx:id="lblLoginError" alignment="CENTER" textAlignment="CENTER" textFill="#BF616A" visible="false" wrapText="true">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+
+            <HBox alignment="CENTER" spacing="10.0">
+               <children>
+                  <Button fx:id="btnCancelar" mnemonicParsing="false" onAction="#handleCancelar" prefHeight="35.0" prefWidth="80.0" style="-fx-background-color: #D08770; -fx-text-fill: white; -fx-background-radius: 5;" text="Cancelar">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="btnIngresar" mnemonicParsing="false" onAction="#handleLogin" prefHeight="35.0" prefWidth="80.0" style="-fx-background-color: #A3BE8C; -fx-text-fill: white; -fx-background-radius: 5;" text="Ingresar">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+</VBox>
