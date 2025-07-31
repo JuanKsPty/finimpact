@@ -1,6 +1,7 @@
 package com.juank.utp.finimpact.controller;
 
 import com.juank.utp.finimpact.model.Usuario;
+import com.juank.utp.finimpact.utils.UserSession;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -26,6 +27,11 @@ public class MainController {
     @FXML private VBox loginView;    // Vista del header para no autenticados
     @FXML private VBox userView;     // Vista del header para autenticados
     @FXML private TabPane mainTabPane;
+
+    // Referencias a los controladores incluidos
+    @FXML private DashboardController dashboardIncludeController;
+    @FXML private IniciativaController iniciativaIncludeController;
+    @FXML private ImpactoController impactoIncludeController;
 
     private Usuario usuarioLogueado;
     private static String ultimoEmailUsado = ""; // Variable estática para recordar el último email
@@ -101,6 +107,8 @@ public class MainController {
      */
     private void realizarLogout() {
         usuarioLogueado = null;
+        // Limpiar la sesión global
+        UserSession.limpiarSesion();
         actualizarEstadoUsuario();
         System.out.println("🔓 Usuario deslogueado exitosamente");
     }
@@ -110,8 +118,71 @@ public class MainController {
      */
     public void setUsuarioLogueado(Usuario usuario) {
         this.usuarioLogueado = usuario;
+        // Establecer usuario en la sesión global para que otros controladores puedan accederlo
+        UserSession.setUsuarioActual(usuario);
         actualizarEstadoUsuario();
+
+        // Reconfigurar el dashboard con el nuevo usuario
+        reconfigurarDashboard();
+
         System.out.println("✅ Usuario logueado: " + usuario.getNombreCompleto() + " (" + usuario.getRol() + ")");
+    }
+
+    /**
+     * Reconfigura el dashboard cuando cambia el usuario
+     */
+    private void reconfigurarDashboard() {
+        // Simular clic en la pestaña del dashboard para forzar reconfiguración
+        if (mainTabPane != null && mainTabPane.getTabs().size() > 0) {
+            // Forzar recarga del dashboard
+            System.out.println("🔄 Reconfigurando dashboard para el nuevo usuario...");
+
+            // Ejecutar en el siguiente ciclo del JavaFX Application Thread
+            javafx.application.Platform.runLater(() -> {
+                try {
+                    // Intentar encontrar y reconfigurar el dashboard
+                    configurarDashboardConUsuario();
+                } catch (Exception e) {
+                    System.err.println("Error al reconfigurar dashboard: " + e.getMessage());
+                    e.printStackTrace();
+                }
+            });
+        }
+    }
+
+    /**
+     * Configura el dashboard con el usuario actual
+     */
+    private void configurarDashboardConUsuario() {
+        System.out.println("🔧 Configurando dashboard con usuario actual...");
+
+        if (dashboardIncludeController != null && usuarioLogueado != null) {
+            System.out.println("📊 Estableciendo usuario en DashboardController...");
+            dashboardIncludeController.setUsuarioLogueado(usuarioLogueado);
+        } else {
+            System.out.println("⚠️ DashboardController es null: " + (dashboardIncludeController == null) +
+                             ", Usuario es null: " + (usuarioLogueado == null));
+
+            // Si el controlador no está disponible, intentar reconfigurar desde UserSession
+            if (usuarioLogueado != null) {
+                System.out.println("🔄 Intentando reconfiguración alternativa...");
+                // La reconfiguración se hará automáticamente cuando el dashboard detecte
+                // cambios en UserSession en el siguiente acceso
+            }
+        }
+
+        // También configurar otros controladores si es necesario
+        if (iniciativaIncludeController != null && usuarioLogueado != null) {
+            // Configurar el controlador de iniciativas si tiene métodos de configuración
+            System.out.println("📋 IniciativaController disponible");
+        }
+
+        if (impactoIncludeController != null && usuarioLogueado != null) {
+            // Configurar el controlador de impactos si tiene métodos de configuración
+            System.out.println("💰 ImpactoController disponible");
+        }
+
+        System.out.println("✅ Dashboard configurado para recargar con nuevo usuario");
     }
 
     /**

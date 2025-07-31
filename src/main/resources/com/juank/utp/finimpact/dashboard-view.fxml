@@ -20,6 +20,30 @@
                </HBox.margin>
             </Label>
             <Region HBox.hgrow="ALWAYS" />
+
+            <!-- Filtros -->
+            <Label text="Iniciativa:" textFill="#2E3440">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </Label>
+            <ComboBox fx:id="cmbFiltroIniciativa" prefWidth="200.0" promptText="Todas las iniciativas">
+               <HBox.margin>
+                  <Insets right="15.0" />
+               </HBox.margin>
+            </ComboBox>
+
+            <Label fx:id="lblFiltroUsuario" text="Usuario:" textFill="#2E3440">
+               <HBox.margin>
+                  <Insets right="5.0" />
+               </HBox.margin>
+            </Label>
+            <ComboBox fx:id="cmbFiltroUsuario" prefWidth="200.0" promptText="Todos los usuarios">
+               <HBox.margin>
+                  <Insets right="15.0" />
+               </HBox.margin>
+            </ComboBox>
+
             <Button fx:id="btnActualizar" mnemonicParsing="false" onAction="#actualizarDashboard" style="-fx-background-color: #5E81AC; -fx-text-fill: white; -fx-background-radius: 5;" text="🔄 Actualizar">
                <HBox.margin>
                   <Insets right="20.0" />

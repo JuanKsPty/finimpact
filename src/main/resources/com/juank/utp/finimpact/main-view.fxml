@@ -84,17 +84,17 @@
                <tabs>
                   <Tab text="Dashboard">
                      <content>
-                        <fx:include source="dashboard-view.fxml" />
+                        <fx:include fx:id="dashboardInclude" source="dashboard-view.fxml" />
                      </content>
                   </Tab>
                   <Tab text="Iniciativas">
                      <content>
-                        <fx:include source="iniciativa-view.fxml" />
+                        <fx:include fx:id="iniciativaInclude" source="iniciativa-view.fxml" />
                      </content>
                   </Tab>
                   <Tab text="Impactos">
                      <content>
-                        <fx:include source="impacto-view.fxml" />
+                        <fx:include fx:id="impactoInclude" source="impacto-view.fxml" />
                      </content>
                   </Tab>
                </tabs>

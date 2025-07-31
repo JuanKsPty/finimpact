@@ -67,7 +67,8 @@ public class IniciativaRepository {
      */
     public List<Iniciativa> findByOwner(int idOwner) {
         List<Iniciativa> iniciativas = new ArrayList<>();
-        String sql = "SELECT id_iniciativa, nombre, descripcion, fecha_inicio, fecha_fin, tipo, estado, riesgo, id_owner, fecha_registro FROM iniciativas WHERE id_owner = ? ORDER BY fecha_registro DESC";
+        String sql = "SELECT id_iniciativa, nombre, descripcion, fecha_inicio, fecha_fin, tipo, estado, riesgo, id_owner, fecha_registro " +
+                    "FROM iniciativas WHERE id_owner = ? ORDER BY fecha_registro DESC";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -81,7 +82,7 @@ public class IniciativaRepository {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al obtener iniciativas por owner: " + e.getMessage());
+            System.err.println("Error al obtener iniciativas por propietario: " + e.getMessage());
         }
 
         return iniciativas;
@@ -295,5 +296,58 @@ public class IniciativaRepository {
         }
 
         return iniciativa;
+    }
+
+    /**
+     * Obtiene iniciativas por nombre
+     */
+    public List<Iniciativa> findByName(String nombre) {
+        List<Iniciativa> iniciativas = new ArrayList<>();
+        String sql = "SELECT id_iniciativa, nombre, descripcion, fecha_inicio, fecha_fin, tipo, estado, riesgo, id_owner, fecha_registro " +
+                    "FROM iniciativas WHERE nombre = ? ORDER BY fecha_registro DESC";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, nombre);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Iniciativa iniciativa = createIniciativaFromResultSet(rs);
+                iniciativas.add(iniciativa);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener iniciativas por nombre: " + e.getMessage());
+        }
+
+        return iniciativas;
+    }
+
+    /**
+     * Obtiene iniciativas por propietario y nombre específico
+     */
+    public List<Iniciativa> findByOwnerAndName(int idOwner, String nombre) {
+        List<Iniciativa> iniciativas = new ArrayList<>();
+        String sql = "SELECT id_iniciativa, nombre, descripcion, fecha_inicio, fecha_fin, tipo, estado, riesgo, id_owner, fecha_registro " +
+                    "FROM iniciativas WHERE id_owner = ? AND nombre = ? ORDER BY fecha_registro DESC";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idOwner);
+            stmt.setString(2, nombre);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Iniciativa iniciativa = createIniciativaFromResultSet(rs);
+                iniciativas.add(iniciativa);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener iniciativas por propietario y nombre: " + e.getMessage());
+        }
+
+        return iniciativas;
     }
 }

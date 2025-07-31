@@ -457,6 +457,73 @@ public class ImpactoRepository {
     }
 
     /**
+     * Obtiene impactos por múltiples IDs de iniciativas
+     */
+    public List<Impacto> findByIniciativaIds(List<Integer> idsIniciativas) {
+        List<Impacto> impactos = new ArrayList<>();
+        if (idsIniciativas == null || idsIniciativas.isEmpty()) {
+            return impactos;
+        }
+
+        StringBuilder sql = new StringBuilder("SELECT id_impacto, id_iniciativa, fecha_creacion, tipo_impacto, multiplicador, atributo_impacto, fecha_impacto, impacto FROM impactos WHERE id_iniciativa IN (");
+        for (int i = 0; i < idsIniciativas.size(); i++) {
+            sql.append("?");
+            if (i < idsIniciativas.size() - 1) {
+                sql.append(",");
+            }
+        }
+        sql.append(") ORDER BY fecha_impacto DESC");
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < idsIniciativas.size(); i++) {
+                stmt.setInt(i + 1, idsIniciativas.get(i));
+            }
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                Impacto impacto = createImpactoFromResultSet(rs);
+                impactos.add(impacto);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener impactos por IDs de iniciativas: " + e.getMessage());
+        }
+
+        return impactos;
+    }
+
+    /**
+     * Obtiene impactos por propietario de iniciativa (para analistas)
+     */
+    public List<Impacto> findByOwner(int idOwner) {
+        List<Impacto> impactos = new ArrayList<>();
+        String sql = "SELECT imp.id_impacto, imp.id_iniciativa, imp.fecha_creacion, imp.tipo_impacto, imp.multiplicador, imp.atributo_impacto, imp.fecha_impacto, imp.impacto " +
+                    "FROM impactos imp " +
+                    "INNER JOIN iniciativas ini ON imp.id_iniciativa = ini.id_iniciativa " +
+                    "WHERE ini.id_owner = ? " +
+                    "ORDER BY imp.fecha_impacto DESC";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, idOwner);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Impacto impacto = createImpactoFromResultSet(rs);
+                impactos.add(impacto);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al obtener impactos por propietario: " + e.getMessage());
+        }
+
+        return impactos;
+    }
+
+    /**
      * Método auxiliar para crear un objeto Impacto desde ResultSet
      */
     private Impacto createImpactoFromResultSet(ResultSet rs) throws SQLException {
