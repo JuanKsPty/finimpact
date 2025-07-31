@@ -4,6 +4,8 @@ import com.juank.utp.finimpact.model.Impacto;
 import com.juank.utp.finimpact.model.Iniciativa;
 import com.juank.utp.finimpact.repository.ImpactoRepository;
 import com.juank.utp.finimpact.repository.IniciativaRepository;
+import com.juank.utp.finimpact.utils.UserSession;
+import com.juank.utp.finimpact.model.Usuario;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,6 +39,7 @@ public class ImpactoController implements Initializable {
     @FXML private ComboBox<String> cbTipo;
     @FXML private ComboBox<String> cbSeveridad;
     @FXML private TextField txtFiltroDescripcion;
+    @FXML private Button btnCrearImpacto; // Botón para crear nuevo impacto
     @FXML private TableView<Impacto> tableImpactos;
     @FXML private TableColumn<Impacto, String> colId;
     @FXML private TableColumn<Impacto, String> colDescripcion;
@@ -64,6 +67,35 @@ public class ImpactoController implements Initializable {
         cargarImpactos();
         configurarFiltros();
         configurarFiltrosAutomaticos();
+        configurarPermisosSegunUsuario(); // Configurar permisos según el rol del usuario
+    }
+
+    /**
+     * Configura los permisos de la interfaz según el rol del usuario logueado
+     */
+    public void configurarPermisosSegunUsuario() {
+        Usuario usuarioActual = UserSession.getUsuarioActual();
+        boolean esViewer = usuarioActual != null && "viewer".equals(usuarioActual.getRol());
+
+        System.out.println("🔐 Configurando permisos de impactos para usuario: " +
+                          (usuarioActual != null ? usuarioActual.getRol() : "sin usuario") +
+                          " (Es viewer: " + esViewer + ")");
+
+        // Si es viewer, ocultar/deshabilitar botón de crear
+        if (btnCrearImpacto != null) {
+            if (esViewer) {
+                btnCrearImpacto.setVisible(false);
+                btnCrearImpacto.setManaged(false);
+                System.out.println("🚫 Botón crear impacto ocultado para viewer");
+            } else {
+                btnCrearImpacto.setVisible(true);
+                btnCrearImpacto.setManaged(true);
+                System.out.println("✅ Botón crear impacto visible para " + (usuarioActual != null ? usuarioActual.getRol() : "usuario"));
+            }
+        }
+
+        // Reconfigurar la tabla para mostrar/ocultar botones de acción
+        configurarTabla();
     }
 
     private void configurarTabla() {
@@ -107,6 +139,10 @@ public class ImpactoController implements Initializable {
             private final HBox pane = new HBox(8);
 
             {
+                // Verificar permisos del usuario actual
+                Usuario usuarioActual = UserSession.getUsuarioActual();
+                boolean esViewer = usuarioActual != null && "viewer".equals(usuarioActual.getRol());
+
                 // Hacer los botones más grandes
                 btnEditar.setPrefWidth(80);
                 btnEditar.setPrefHeight(35);
@@ -116,24 +152,34 @@ public class ImpactoController implements Initializable {
                 btnEditar.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 12px; -fx-font-weight: bold;");
                 btnEliminar.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 12px; -fx-font-weight: bold;");
 
-                pane.getChildren().addAll(btnEditar, btnEliminar);
-                pane.setAlignment(javafx.geometry.Pos.CENTER);
+                // Si es viewer, ocultar los botones
+                if (esViewer) {
+                    btnEditar.setVisible(false);
+                    btnEliminar.setVisible(false);
+                    System.out.println("🚫 Botones de acción de impactos ocultos para viewer");
+                } else {
+                    pane.getChildren().addAll(btnEditar, btnEliminar);
+                    pane.setAlignment(javafx.geometry.Pos.CENTER);
 
-                btnEditar.setOnAction(event -> {
-                    Impacto impacto = getTableView().getItems().get(getIndex());
-                    editarImpacto(impacto);
-                });
+                    btnEditar.setOnAction(event -> {
+                        Impacto impacto = getTableView().getItems().get(getIndex());
+                        editarImpacto(impacto);
+                    });
 
-                btnEliminar.setOnAction(event -> {
-                    Impacto impacto = getTableView().getItems().get(getIndex());
-                    eliminarImpacto(impacto);
-                });
+                    btnEliminar.setOnAction(event -> {
+                        Impacto impacto = getTableView().getItems().get(getIndex());
+                        eliminarImpacto(impacto);
+                    });
+                }
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : pane);
+                // Solo mostrar el panel si no es viewer y no está vacío
+                Usuario usuarioActual = UserSession.getUsuarioActual();
+                boolean esViewer = usuarioActual != null && "viewer".equals(usuarioActual.getRol());
+                setGraphic((empty || esViewer) ? null : pane);
             }
         });
 
@@ -154,6 +200,12 @@ public class ImpactoController implements Initializable {
 
     @FXML
     private void mostrarFormularioImpacto() {
+        // Verificar permisos antes de mostrar el formulario
+        Usuario usuarioActual = UserSession.getUsuarioActual();
+        if (usuarioActual != null && "viewer".equals(usuarioActual.getRol())) {
+            mostrarError("Acceso Denegado", "Los usuarios con rol 'Viewer' no pueden crear impactos.");
+            return;
+        }
         mostrarFormulario(null);
     }
 
@@ -185,9 +237,24 @@ public class ImpactoController implements Initializable {
         impactosFiltradosList.setAll(impactosList);
     }
 
-    private void cargarImpactos() {
+    /**
+     * Método público para recargar impactos según el usuario actual
+     */
+    public void cargarImpactos() {
         try {
-            List<Impacto> impactos = impactoRepository.findAll();
+            Usuario usuarioActual = UserSession.getUsuarioActual();
+            List<Impacto> impactos;
+
+            if (usuarioActual != null && "analista".equals(usuarioActual.getRol())) {
+                // Para analistas: solo cargar impactos relacionados a sus iniciativas
+                impactos = impactoRepository.findByOwner(usuarioActual.getIdUsuario());
+                System.out.println("🔍 Cargando impactos del analista: " + usuarioActual.getNombreCompleto() + " (" + impactos.size() + " impactos)");
+            } else {
+                // Para admin y viewer: cargar todos los impactos
+                impactos = impactoRepository.findAll();
+                System.out.println("🔍 Cargando todos los impactos para " + (usuarioActual != null ? usuarioActual.getRol() : "usuario") + " (" + impactos.size() + " impactos)");
+            }
+
             impactosList.setAll(impactos);
             impactosFiltradosList.setAll(impactos);
         } catch (Exception e) {
@@ -270,7 +337,19 @@ public class ImpactoController implements Initializable {
             cbIniciativa.setPrefHeight(35);
 
             try {
-                List<Iniciativa> iniciativas = iniciativaRepository.findAll();
+                Usuario usuarioActual = UserSession.getUsuarioActual();
+                List<Iniciativa> iniciativas;
+
+                if (usuarioActual != null && "analista".equals(usuarioActual.getRol())) {
+                    // Para analistas: solo mostrar sus iniciativas en el formulario
+                    iniciativas = iniciativaRepository.findByOwner(usuarioActual.getIdUsuario());
+                    System.out.println("📋 Cargando iniciativas del analista para formulario: " + iniciativas.size());
+                } else {
+                    // Para admin y viewer: mostrar todas las iniciativas
+                    iniciativas = iniciativaRepository.findAll();
+                    System.out.println("📋 Cargando todas las iniciativas para formulario: " + iniciativas.size());
+                }
+
                 cbIniciativa.getItems().setAll(iniciativas);
                 if (impacto != null && impacto.getIdIniciativa() != 0) {
                     Iniciativa iniciativaSeleccionada = iniciativas.stream()

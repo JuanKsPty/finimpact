@@ -173,13 +173,37 @@ public class MainController {
 
         // También configurar otros controladores si es necesario
         if (iniciativaIncludeController != null && usuarioLogueado != null) {
-            // Configurar el controlador de iniciativas si tiene métodos de configuración
-            System.out.println("📋 IniciativaController disponible");
+            // Reconfigurar el controlador de iniciativas
+            System.out.println("📋 Reconfigurando IniciativaController para usuario: " + usuarioLogueado.getRol());
+            // Forzar recarga de datos en IniciativaController
+            javafx.application.Platform.runLater(() -> {
+                try {
+                    // Si el controlador tiene un método para recargar datos, llamarlo
+                    iniciativaIncludeController.configurarPermisosSegunUsuario();
+                    iniciativaIncludeController.cargarIniciativas();
+                } catch (Exception e) {
+                    System.err.println("Error al reconfigurar IniciativaController: " + e.getMessage());
+                }
+            });
+        } else {
+            System.out.println("⚠️ IniciativaController es null: " + (iniciativaIncludeController == null));
         }
 
         if (impactoIncludeController != null && usuarioLogueado != null) {
-            // Configurar el controlador de impactos si tiene métodos de configuración
-            System.out.println("💰 ImpactoController disponible");
+            // Reconfigurar el controlador de impactos
+            System.out.println("💰 Reconfigurando ImpactoController para usuario: " + usuarioLogueado.getRol());
+            // Forzar recarga de datos en ImpactoController
+            javafx.application.Platform.runLater(() -> {
+                try {
+                    // Si el controlador tiene un método para recargar datos, llamarlo
+                    impactoIncludeController.configurarPermisosSegunUsuario();
+                    impactoIncludeController.cargarImpactos();
+                } catch (Exception e) {
+                    System.err.println("Error al reconfigurar ImpactoController: " + e.getMessage());
+                }
+            });
+        } else {
+            System.out.println("⚠️ ImpactoController es null: " + (impactoIncludeController == null));
         }
 
         System.out.println("✅ Dashboard configurado para recargar con nuevo usuario");

@@ -4,6 +4,7 @@ import com.juank.utp.finimpact.model.Iniciativa;
 import com.juank.utp.finimpact.model.Usuario;
 import com.juank.utp.finimpact.repository.IniciativaRepository;
 import com.juank.utp.finimpact.repository.UsuarioRepository;
+import com.juank.utp.finimpact.utils.UserSession;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -34,6 +35,7 @@ public class IniciativaController implements Initializable {
     @FXML private ComboBox<String> cbEstado;
     @FXML private ComboBox<String> cbRiesgo;
     @FXML private TextField txtFiltroNombre;
+    @FXML private Button btnCrearIniciativa; // Botón para crear nueva iniciativa
     @FXML private TableView<Iniciativa> tableIniciativas;
     @FXML private TableColumn<Iniciativa, String> colId;
     @FXML private TableColumn<Iniciativa, String> colNombre;
@@ -62,6 +64,35 @@ public class IniciativaController implements Initializable {
         cargarIniciativas();
         configurarFiltros();
         configurarFiltrosAutomaticos();
+        configurarPermisosSegunUsuario(); // Configurar permisos según el rol del usuario
+    }
+
+    /**
+     * Configura los permisos de la interfaz según el rol del usuario logueado
+     */
+    public void configurarPermisosSegunUsuario() {
+        Usuario usuarioActual = UserSession.getUsuarioActual();
+        boolean esViewer = usuarioActual != null && "viewer".equals(usuarioActual.getRol());
+
+        System.out.println("🔐 Configurando permisos para usuario: " +
+                          (usuarioActual != null ? usuarioActual.getRol() : "sin usuario") +
+                          " (Es viewer: " + esViewer + ")");
+
+        // Si es viewer, ocultar/deshabilitar botón de crear
+        if (btnCrearIniciativa != null) {
+            if (esViewer) {
+                btnCrearIniciativa.setVisible(false);
+                btnCrearIniciativa.setManaged(false);
+                System.out.println("🚫 Botón crear iniciativa ocultado para viewer");
+            } else {
+                btnCrearIniciativa.setVisible(true);
+                btnCrearIniciativa.setManaged(true);
+                System.out.println("✅ Botón crear iniciativa visible para " + (usuarioActual != null ? usuarioActual.getRol() : "usuario"));
+            }
+        }
+
+        // Reconfigurar la tabla para mostrar/ocultar botones de acción
+        configurarTabla();
     }
 
     private void configurarTabla() {
@@ -90,6 +121,10 @@ public class IniciativaController implements Initializable {
             private final HBox pane = new HBox(8);
 
             {
+                // Verificar permisos del usuario actual
+                Usuario usuarioActual = UserSession.getUsuarioActual();
+                boolean esViewer = usuarioActual != null && "viewer".equals(usuarioActual.getRol());
+
                 // Hacer los botones más grandes
                 btnEditar.setPrefWidth(80);
                 btnEditar.setPrefHeight(35);
@@ -99,24 +134,34 @@ public class IniciativaController implements Initializable {
                 btnEditar.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 12px; -fx-font-weight: bold;");
                 btnEliminar.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 12px; -fx-font-weight: bold;");
 
-                pane.getChildren().addAll(btnEditar, btnEliminar);
-                pane.setAlignment(javafx.geometry.Pos.CENTER);
+                // Si es viewer, ocultar los botones
+                if (esViewer) {
+                    btnEditar.setVisible(false);
+                    btnEliminar.setVisible(false);
+                    System.out.println("🚫 Botones de acción ocultos para viewer");
+                } else {
+                    pane.getChildren().addAll(btnEditar, btnEliminar);
+                    pane.setAlignment(javafx.geometry.Pos.CENTER);
 
-                btnEditar.setOnAction(event -> {
-                    Iniciativa iniciativa = getTableView().getItems().get(getIndex());
-                    editarIniciativa(iniciativa);
-                });
+                    btnEditar.setOnAction(event -> {
+                        Iniciativa iniciativa = getTableView().getItems().get(getIndex());
+                        editarIniciativa(iniciativa);
+                    });
 
-                btnEliminar.setOnAction(event -> {
-                    Iniciativa iniciativa = getTableView().getItems().get(getIndex());
-                    eliminarIniciativa(iniciativa);
-                });
+                    btnEliminar.setOnAction(event -> {
+                        Iniciativa iniciativa = getTableView().getItems().get(getIndex());
+                        eliminarIniciativa(iniciativa);
+                    });
+                }
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
-                setGraphic(empty ? null : pane);
+                // Solo mostrar el panel si no es viewer y no está vacío
+                Usuario usuarioActual = UserSession.getUsuarioActual();
+                boolean esViewer = usuarioActual != null && "viewer".equals(usuarioActual.getRol());
+                setGraphic((empty || esViewer) ? null : pane);
             }
         });
 
@@ -137,6 +182,12 @@ public class IniciativaController implements Initializable {
 
     @FXML
     private void mostrarFormularioIniciativa() {
+        // Verificar permisos antes de mostrar el formulario
+        Usuario usuarioActual = UserSession.getUsuarioActual();
+        if (usuarioActual != null && "viewer".equals(usuarioActual.getRol())) {
+            mostrarError("Acceso Denegado", "Los usuarios con rol 'Viewer' no pueden crear iniciativas.");
+            return;
+        }
         mostrarFormulario(null);
     }
 
@@ -168,9 +219,24 @@ public class IniciativaController implements Initializable {
         iniciativasFiltradasList.setAll(iniciativasList);
     }
 
-    private void cargarIniciativas() {
+    /**
+     * Método público para recargar iniciativas según el usuario actual
+     */
+    public void cargarIniciativas() {
         try {
-            List<Iniciativa> iniciativas = iniciativaRepository.findAll();
+            Usuario usuarioActual = UserSession.getUsuarioActual();
+            List<Iniciativa> iniciativas;
+
+            if (usuarioActual != null && "analista".equals(usuarioActual.getRol())) {
+                // Para analistas: solo cargar sus iniciativas asignadas
+                iniciativas = iniciativaRepository.findByOwner(usuarioActual.getIdUsuario());
+                System.out.println("🔍 Cargando iniciativas del analista: " + usuarioActual.getNombreCompleto() + " (" + iniciativas.size() + " iniciativas)");
+            } else {
+                // Para admin y viewer: cargar todas las iniciativas
+                iniciativas = iniciativaRepository.findAll();
+                System.out.println("🔍 Cargando todas las iniciativas para " + (usuarioActual != null ? usuarioActual.getRol() : "usuario") + " (" + iniciativas.size() + " iniciativas)");
+            }
+
             iniciativasList.setAll(iniciativas);
             iniciativasFiltradasList.setAll(iniciativas);
         } catch (Exception e) {
