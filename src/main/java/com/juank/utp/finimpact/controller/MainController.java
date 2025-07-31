@@ -18,19 +18,17 @@ import java.io.IOException;
  */
 public class MainController {
 
-    @FXML
-    private Button btnLogin;
-
-    @FXML
-    private Label lblStatus;
-
-    @FXML
-    private VBox welcomeView;
-
-    @FXML
-    private TabPane mainTabPane;
+    @FXML private Button btnLogin;
+    @FXML private Button btnLogout;
+    @FXML private Button btnUserAction;
+    @FXML private Label lblStatus;
+    @FXML private VBox welcomeView;  // Vista central de bienvenida
+    @FXML private VBox loginView;    // Vista del header para no autenticados
+    @FXML private VBox userView;     // Vista del header para autenticados
+    @FXML private TabPane mainTabPane;
 
     private Usuario usuarioLogueado;
+    private static String ultimoEmailUsado = ""; // Variable estática para recordar el último email
 
     @FXML
     private void initialize() {
@@ -42,12 +40,32 @@ public class MainController {
      */
     @FXML
     private void handleLogin() {
+        mostrarVentanaLogin();
+    }
+
+    /**
+     * Maneja el evento del botón de logout
+     */
+    @FXML
+    private void handleLogout() {
+        realizarLogout();
+    }
+
+    /**
+     * Maneja el evento del botón de acción del usuario (Mi Perfil / Gestión Usuarios)
+     */
+    @FXML
+    private void handleUserAction() {
         if (usuarioLogueado == null) {
-            // Mostrar ventana de login
-            mostrarVentanaLogin();
+            return;
+        }
+
+        if ("admin".equals(usuarioLogueado.getRol())) {
+            // Si es admin, mostrar gestión de usuarios
+            mostrarGestionUsuarios();
         } else {
-            // Realizar logout
-            realizarLogout();
+            // Si es usuario normal, mostrar mi perfil
+            mostrarMiPerfil();
         }
     }
 
@@ -101,30 +119,51 @@ public class MainController {
      */
     private void actualizarEstadoUsuario() {
         if (usuarioLogueado == null) {
-            btnLogin.setText("Login");
+            // Usuario NO logueado - mostrar solo el botón de login
             lblStatus.setText("No hay usuario autenticado");
-            btnLogin.setStyle("-fx-background-color: #5E81AC; -fx-text-fill: white; -fx-background-radius: 5;");
 
-            // Mostrar vista de bienvenida y ocultar TabPane
+            // En el header: mostrar loginView, ocultar userView completamente
+            loginView.setVisible(true);
+            loginView.setManaged(true);
+            userView.setVisible(false);
+            userView.setManaged(false);
+
+            // En el centro: mostrar welcomeView, ocultar TabPane
             welcomeView.setVisible(true);
+            welcomeView.setManaged(true);
             mainTabPane.setVisible(false);
+            mainTabPane.setManaged(false);
         } else {
-            btnLogin.setText("Logout");
+            // Usuario logueado - mostrar botones de usuario
             lblStatus.setText("Conectado como: " + usuarioLogueado.getNombreCompleto() + " (" +
                             getRolDisplayName(usuarioLogueado.getRol()) + ")");
-            btnLogin.setStyle("-fx-background-color: #D08770; -fx-text-fill: white; -fx-background-radius: 5;");
 
-            // Ocultar vista de bienvenida y mostrar TabPane
+            // Configurar el botón de acción según el tipo de usuario
+            if ("admin".equals(usuarioLogueado.getRol())) {
+                btnUserAction.setText("Gestión Usuarios");
+            } else {
+                btnUserAction.setText("Mi Perfil");
+            }
+
+            // En el header: ocultar loginView completamente, mostrar userView
+            loginView.setVisible(false);
+            loginView.setManaged(false);
+            userView.setVisible(true);
+            userView.setManaged(true);
+
+            // En el centro: ocultar welcomeView, mostrar TabPane
             welcomeView.setVisible(false);
+            welcomeView.setManaged(false);
             mainTabPane.setVisible(true);
+            mainTabPane.setManaged(true);
         }
     }
 
     /**
-     * Convierte el rol técnico a un nombre más amigable
+     * Convierte el tipo técnico a un nombre más amigable
      */
-    private String getRolDisplayName(String rol) {
-        switch (rol.toLowerCase()) {
+    private String getRolDisplayName(String tipo) {
+        switch (tipo.toLowerCase()) {
             case "admin":
                 return "Administrador";
             case "analista":
@@ -132,7 +171,7 @@ public class MainController {
             case "viewer":
                 return "Visualizador";
             default:
-                return rol;
+                return tipo;
         }
     }
 
@@ -141,5 +180,74 @@ public class MainController {
      */
     public Usuario getUsuarioLogueado() {
         return usuarioLogueado;
+    }
+
+    /**
+     * Muestra la vista de gestión de usuarios (para admin)
+     */
+    private void mostrarGestionUsuarios() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/juank/utp/finimpact/usuarios-view.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            Stage usuariosStage = new Stage();
+            usuariosStage.setTitle("Gestión de Usuarios - FinImpact");
+            usuariosStage.setScene(scene);
+            usuariosStage.initModality(Modality.APPLICATION_MODAL);
+            usuariosStage.setWidth(900);
+            usuariosStage.setHeight(700);
+            usuariosStage.setMinWidth(900);
+            usuariosStage.setMinHeight(700);
+            usuariosStage.centerOnScreen();
+            usuariosStage.showAndWait();
+
+        } catch (IOException e) {
+            System.err.println("Error al cargar la vista de usuarios: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Muestra la vista de mi perfil (para usuarios normales)
+     */
+    private void mostrarMiPerfil() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/juank/utp/finimpact/perfil-view.fxml"));
+            Scene scene = new Scene(loader.load());
+
+            Stage perfilStage = new Stage();
+            perfilStage.setTitle("Mi Perfil - FinImpact");
+            perfilStage.setScene(scene);
+            perfilStage.initModality(Modality.APPLICATION_MODAL);
+            perfilStage.setWidth(600);
+            perfilStage.setHeight(500);
+            perfilStage.setMinWidth(600);
+            perfilStage.setMinHeight(500);
+            perfilStage.centerOnScreen();
+
+            // Pasar el usuario actual al controlador del perfil
+            PerfilController perfilController = loader.getController();
+            perfilController.setUsuario(usuarioLogueado);
+
+            perfilStage.showAndWait();
+
+        } catch (IOException e) {
+            System.err.println("Error al cargar la vista de perfil: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Guarda el email del último usuario que se conectó
+     */
+    public static void guardarUltimoEmail(String email) {
+        ultimoEmailUsado = email;
+    }
+
+    /**
+     * Obtiene el email del último usuario que se conectó
+     */
+    public static String getUltimoEmailUsado() {
+        return ultimoEmailUsado;
     }
 }

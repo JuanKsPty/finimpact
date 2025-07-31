@@ -72,8 +72,8 @@
          <columns>
             <TableColumn fx:id="colId" minWidth="50.0" prefWidth="80.0" text="ID" />
             <TableColumn fx:id="colNombre" minWidth="150.0" prefWidth="360.0" text="Nombre" />
-            <TableColumn fx:id="colDescripcion" minWidth="90.0" prefWidth="90.0" text="Descripción" />
-            <TableColumn fx:id="colTipo" minWidth="100.0" prefWidth="120.0" text="Tipo" />
+            <TableColumn fx:id="colDescripcion" minWidth="90.0" prefWidth="300.0" text="Descripción" />
+            <TableColumn fx:id="colTipo" minWidth="1.0" prefWidth="1.0" text="Tipo" />
             <TableColumn fx:id="colEstado" minWidth="100.0" prefWidth="120.0" text="Estado" />
             <TableColumn fx:id="colRiesgo" minWidth="80.0" prefWidth="100.0" text="Riesgo" />
             <TableColumn fx:id="colFechaInicio" minWidth="100.0" prefWidth="120.0" text="Fecha Inicio" />

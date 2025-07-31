@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.String?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.juank.utp.finimpact.controller.UsuarioController">
+   <children>
+      <!-- Header -->
+      <HBox alignment="CENTER_LEFT" prefHeight="60.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D8DEE9; -fx-border-width: 0 0 1 0;">
+         <children>
+            <Label text="Gestión de Usuarios" textFill="#2E3440">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnNuevoUsuario" mnemonicParsing="false" onAction="#mostrarFormularioUsuario"
+                    style="-fx-background-color: #5E81AC; -fx-text-fill: white; -fx-background-radius: 5;"
+                    text="+ Nuevo Usuario">
+               <HBox.margin>
+                  <Insets right="20.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+
+      <!-- Filtros -->
+      <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: #ECEFF4; -fx-padding: 15;">
+         <children>
+            <Label text="Filtros:" textFill="#4C566A">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+
+            <ComboBox fx:id="cbTipo" promptText="Tipo">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="Todos" />
+                     <String fx:value="admin" />
+                     <String fx:value="analista" />
+                     <String fx:value="viewer" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+
+            <TextField fx:id="txtFiltroNombre" promptText="Buscar por nombre..." prefWidth="200.0" />
+
+            <Button fx:id="btnLimpiarFiltros" mnemonicParsing="false" onAction="#limpiarFiltros"
+                    style="-fx-background-color: #D08770; -fx-text-fill: white; -fx-background-radius: 3;"
+                    text="Limpiar Filtros" />
+         </children>
+      </HBox>
+
+      <!-- Tabla -->
+      <TableView fx:id="tableUsuarios" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn fx:id="colId" minWidth="50.0" prefWidth="80.0" text="ID" />
+            <TableColumn fx:id="colNombreCompleto" minWidth="200.0" prefWidth="250.0" text="Nombre Completo" />
+            <TableColumn fx:id="colUsuario" minWidth="150.0" prefWidth="180.0" text="Usuario" />
+            <TableColumn fx:id="colEmail" minWidth="200.0" prefWidth="250.0" text="Email" />
+            <TableColumn fx:id="colTipo" minWidth="100.0" prefWidth="120.0" text="Tipo" />
+            <TableColumn fx:id="colAcciones" minWidth="150.0" prefWidth="200.0" text="Acciones" />
+         </columns>
+         <VBox.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+         </VBox.margin>
+      </TableView>
+   </children>
+</VBox>

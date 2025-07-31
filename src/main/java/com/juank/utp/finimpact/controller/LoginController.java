@@ -44,6 +44,14 @@ public class LoginController {
     private void initialize() {
         usuarioRepository = new UsuarioRepository();
 
+        // Cargar el último email usado si existe
+        String ultimoEmail = MainController.getUltimoEmailUsado();
+        if (!ultimoEmail.isEmpty()) {
+            txtEmail.setText(ultimoEmail);
+            // Enfocar el campo de contraseña ya que el email está prellenado
+            txtPassword.requestFocus();
+        }
+
         // Configurar validaciones en tiempo real
         txtEmail.textProperty().addListener((observable, oldValue, newValue) -> {
             limpiarErrorEmail();
@@ -94,6 +102,9 @@ public class LoginController {
                     mostrarErrorLogin("Usuario inactivo. Contacte al administrador.");
                     return;
                 }
+
+                // Guardar el email para futuras sesiones
+                MainController.guardarUltimoEmail(email);
 
                 // Login exitoso
                 mainController.setUsuarioLogueado(usuario);

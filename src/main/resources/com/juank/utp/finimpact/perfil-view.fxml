@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox prefHeight="602.0" prefWidth="630.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.juank.utp.finimpact.controller.PerfilController">
+   <children>
+      <!-- Header -->
+      <HBox alignment="CENTER_LEFT" prefHeight="60.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D8DEE9; -fx-border-width: 0 0 1 0;">
+         <children>
+            <Label text="Mi Perfil" textFill="#2E3440">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+
+      <!-- Contenido del perfil -->
+      <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox spacing="20.0" style="-fx-padding: 30;">
+               <children>
+                  <!-- Información personal -->
+                  <VBox spacing="15.0">
+                     <children>
+                        <Label text="Información Personal" textFill="#2E3440">
+                           <font>
+                              <Font name="System Bold" size="18.0" />
+                           </font>
+                        </Label>
+
+                        <GridPane hgap="15.0" vgap="15.0">
+                           <columnConstraints>
+                              <ColumnConstraints minWidth="150.0" prefWidth="150.0" />
+                              <ColumnConstraints minWidth="300.0" prefWidth="350.0" />
+                           </columnConstraints>
+
+                           <children>
+                              <Label text="Nombre Completo:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lblNombreCompleto" text="" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+
+                              <Label text="Usuario:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lblUsuario" text="" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+
+                              <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lblEmail" text="" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+
+                              <Label text="Tipo de Usuario:" GridPane.columnIndex="0" GridPane.rowIndex="3">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lblTipo" text="" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                           <rowConstraints>
+                              <RowConstraints />
+                              <RowConstraints />
+                              <RowConstraints />
+                              <RowConstraints />
+                           </rowConstraints>
+                        </GridPane>
+                     </children>
+                  </VBox>
+
+                  <!-- Separador -->
+                  <Separator />
+
+                  <!-- Cambio de contraseña -->
+                  <VBox spacing="15.0">
+                     <children>
+                        <Label text="Cambiar Contraseña" textFill="#2E3440">
+                           <font>
+                              <Font name="System Bold" size="18.0" />
+                           </font>
+                        </Label>
+
+                        <GridPane hgap="15.0" vgap="15.0">
+                           <columnConstraints>
+                              <ColumnConstraints minWidth="150.0" prefWidth="150.0" />
+                              <ColumnConstraints minWidth="300.0" prefWidth="350.0" />
+                           </columnConstraints>
+
+                           <children>
+                              <Label text="Contraseña Actual:" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <PasswordField fx:id="txtPasswordActual" prefHeight="35.0" promptText="Ingrese su contraseña actual" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                              <Label text="Nueva Contraseña:" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <PasswordField fx:id="txtPasswordNueva" prefHeight="35.0" promptText="Ingrese la nueva contraseña" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                              <Label text="Confirmar Contraseña:" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <PasswordField fx:id="txtPasswordConfirmar" prefHeight="35.0" promptText="Confirme la nueva contraseña" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                           </children>
+                           <rowConstraints>
+                              <RowConstraints />
+                              <RowConstraints />
+                              <RowConstraints />
+                           </rowConstraints>
+                        </GridPane>
+
+                        <HBox alignment="CENTER_LEFT" spacing="15.0">
+                           <children>
+                              <Button fx:id="btnCambiarPassword" mnemonicParsing="false" onAction="#cambiarPassword" prefHeight="40.0" prefWidth="198.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 14px; -fx-font-weight: bold;" text="Cambiar Contraseña" />
+                              <Button fx:id="btnLimpiarCampos" mnemonicParsing="false" onAction="#limpiarCampos" prefHeight="40.0" prefWidth="120.0" style="-fx-background-color: #D08770; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 14px; -fx-font-weight: bold;" text="Limpiar" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+   </children>
+</VBox>
