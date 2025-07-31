@@ -1,24 +1,274 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.*?>
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0" style="-fx-background-color: #ECEFF4;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.juank.utp.finimpact.controller.DashboardController">
+<VBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.juank.utp.finimpact.controller.DashboardController">
    <children>
-      <Label text="Dashboard" textAlignment="CENTER" textFill="#2E3440">
-         <font>
-            <Font name="System Bold" size="36.0" />
-         </font>
-      </Label>
-      <Label text="Vista del Dashboard - Próximamente KPIs y gráficos" textAlignment="CENTER" textFill="#4C566A">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Label>
+      <!-- Header -->
+      <HBox alignment="CENTER_LEFT" prefHeight="60.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D8DEE9; -fx-border-width: 0 0 1 0;">
+         <children>
+            <Label text="Dashboard" textFill="#2E3440">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnActualizar" mnemonicParsing="false" onAction="#actualizarDashboard" style="-fx-background-color: #5E81AC; -fx-text-fill: white; -fx-background-radius: 5;" text="🔄 Actualizar">
+               <HBox.margin>
+                  <Insets right="20.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+
+      <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
+         <content>
+            <VBox spacing="20.0" style="-fx-padding: 20;">
+               <children>
+                  <!-- Charts Section -->
+                  <Label text="Análisis Gráfico" textFill="#2E3440">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                  </Label>
+
+                  <!-- Charts Container -->
+                  <GridPane hgap="20.0" vgap="20.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="300.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="300.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <!-- Gráfico de Iniciativas por Estado -->
+                        <VBox style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                           <children>
+                              <Label text="Iniciativas por Estado" style="-fx-padding: 15 15 5 15;" textFill="#2E3440">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <PieChart fx:id="chartIniciativasPorEstado" prefHeight="250.0" style="-fx-padding: 10;" />
+                           </children>
+                        </VBox>
+
+                        <!-- Gráfico de Impactos por Tipo -->
+                        <VBox style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                           <children>
+                              <Label text="Impactos por Tipo" style="-fx-padding: 15 15 5 15;" textFill="#2E3440">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <BarChart fx:id="chartImpactosPorTipo" prefHeight="250.0" style="-fx-padding: 10;">
+                                 <xAxis>
+                                    <CategoryAxis side="BOTTOM" />
+                                 </xAxis>
+                                 <yAxis>
+                                    <NumberAxis side="LEFT" />
+                                 </yAxis>
+                              </BarChart>
+                           </children>
+                        </VBox>
+
+                        <!-- Gráfico de Impacto Financiero Mensual -->
+                        <VBox style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                           <children>
+                              <Label text="Impacto Financiero Mensual" style="-fx-padding: 15 15 5 15;" textFill="#2E3440">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <LineChart fx:id="chartImpactoMensual" prefHeight="250.0" style="-fx-padding: 10;">
+                                 <xAxis>
+                                    <CategoryAxis side="BOTTOM" />
+                                 </xAxis>
+                                 <yAxis>
+                                    <NumberAxis side="LEFT" />
+                                 </yAxis>
+                              </LineChart>
+                           </children>
+                        </VBox>
+
+                        <!-- Gráfico de Iniciativas por Riesgo -->
+                        <VBox style="-fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 5, 0, 0, 0);" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <children>
+                              <Label text="Iniciativas por Nivel de Riesgo" style="-fx-padding: 15 15 5 15;" textFill="#2E3440">
+                                 <font>
+                                    <Font name="System Bold" size="14.0" />
+                                 </font>
+                              </Label>
+                              <PieChart fx:id="chartIniciativasPorRiesgo" prefHeight="250.0" style="-fx-padding: 10;" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </GridPane>
+
+                  <!-- KPIs Section -->
+                  <Label text="Indicadores Clave (KPIs)" textFill="#2E3440">
+                     <font>
+                        <Font name="System Bold" size="18.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets top="20.0" />
+                     </VBox.margin>
+                  </Label>
+
+                  <!-- KPIs Container -->
+                  <GridPane hgap="15.0" vgap="15.0">
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                     </columnConstraints>
+                     <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="120.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="120.0" vgrow="SOMETIMES" />
+                     </rowConstraints>
+                     <children>
+                        <!-- Total Iniciativas -->
+                        <VBox alignment="CENTER" style="-fx-background-color: #5E81AC; -fx-background-radius: 8;" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                           <children>
+                              <Label fx:id="lblTotalIniciativas" text="0" textFill="white">
+                                 <font>
+                                    <Font name="System Bold" size="28.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Total Iniciativas" textFill="white">
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <!-- Iniciativas Activas -->
+                        <VBox alignment="CENTER" style="-fx-background-color: #A3BE8C; -fx-background-radius: 8;" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                           <children>
+                              <Label fx:id="lblIniciativasActivas" text="0" textFill="white">
+                                 <font>
+                                    <Font name="System Bold" size="28.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Iniciativas Activas" textFill="white">
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <!-- Impacto Total -->
+                        <VBox alignment="CENTER" style="-fx-background-color: #EBCB8B; -fx-background-radius: 8;" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                           <children>
+                              <Label fx:id="lblImpactoTotal" text="" textFill="white">
+                                 <font>
+                                    <Font name="System Bold" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Impacto Total" textFill="white">
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <!-- Impacto Promedio -->
+                        <VBox alignment="CENTER" style="-fx-background-color: #D08770; -fx-background-radius: 8;" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                           <children>
+                              <Label fx:id="lblImpactoPromedio" text="" textFill="white">
+                                 <font>
+                                    <Font name="System Bold" size="24.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Impacto Promedio" textFill="white">
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <!-- Riesgo Alto -->
+                        <VBox alignment="CENTER" style="-fx-background-color: #BF616A; -fx-background-radius: 8;" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                           <children>
+                              <Label fx:id="lblRiesgoAlto" text="0" textFill="white">
+                                 <font>
+                                    <Font name="System Bold" size="28.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Riesgo Alto" textFill="white">
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <!-- Iniciativas Finalizadas -->
+                        <VBox alignment="CENTER" style="-fx-background-color: #88C0D0; -fx-background-radius: 8;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                           <children>
+                              <Label fx:id="lblIniciativasFinalizadas" text="0" textFill="white">
+                                 <font>
+                                    <Font name="System Bold" size="28.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Finalizadas" textFill="white">
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <!-- ROI Proyectado -->
+                        <VBox alignment="CENTER" style="-fx-background-color: #B48EAD; -fx-background-radius: 8;" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                           <children>
+                              <Label fx:id="lblROI" text="0%" textFill="white">
+                                 <font>
+                                    <Font name="System Bold" size="28.0" />
+                                 </font>
+                              </Label>
+                              <Label text="ROI Proyectado" textFill="white">
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+
+                        <!-- Eficiencia -->
+                        <VBox alignment="CENTER" style="-fx-background-color: #81A1C1; -fx-background-radius: 8;" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                           <children>
+                              <Label fx:id="lblEficiencia" text="0%" textFill="white">
+                                 <font>
+                                    <Font name="System Bold" size="28.0" />
+                                 </font>
+                              </Label>
+                              <Label text="Eficiencia" textFill="white">
+                                 <font>
+                                    <Font size="12.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </VBox>
+                     </children>
+                  </GridPane>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
    </children>
-   <padding>
-      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-   </padding>
 </VBox>

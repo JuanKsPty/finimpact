@@ -351,6 +351,112 @@ public class ImpactoRepository {
     }
 
     /**
+     * Suma de impactos planeados del mes actual
+     */
+    public BigDecimal getSumaImpactosPlaneadosMesActual() {
+        String sql = "SELECT COALESCE(SUM(impacto * multiplicador), 0) FROM impactos " +
+                    "WHERE atributo_impacto = 'Planeado' " +
+                    "AND YEAR(fecha_impacto) = YEAR(GETDATE()) " +
+                    "AND MONTH(fecha_impacto) = MONTH(GETDATE())";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getBigDecimal(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener suma de impactos planeados del mes: " + e.getMessage());
+        }
+
+        return BigDecimal.ZERO;
+    }
+
+    /**
+     * Suma de impactos reales del mes actual
+     */
+    public BigDecimal getSumaImpactosRealesMesActual() {
+        String sql = "SELECT COALESCE(SUM(impacto * multiplicador), 0) FROM impactos " +
+                    "WHERE atributo_impacto = 'Real' " +
+                    "AND YEAR(fecha_impacto) = YEAR(GETDATE()) " +
+                    "AND MONTH(fecha_impacto) = MONTH(GETDATE())";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getBigDecimal(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener suma de impactos reales del mes: " + e.getMessage());
+        }
+
+        return BigDecimal.ZERO;
+    }
+
+    /**
+     * Obtiene la distribución de impactos por tipo para gráfico de pastel
+     */
+    public List<Object[]> getDistribucionPorTipo() {
+        List<Object[]> distribucion = new ArrayList<>();
+        String sql = "SELECT tipo_impacto, SUM(impacto * multiplicador) as total " +
+                    "FROM impactos " +
+                    "GROUP BY tipo_impacto " +
+                    "ORDER BY total DESC";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                String tipo = rs.getString("tipo_impacto");
+                BigDecimal total = rs.getBigDecimal("total");
+                distribucion.add(new Object[]{tipo, total});
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener distribución por tipo: " + e.getMessage());
+        }
+
+        return distribucion;
+    }
+
+    /**
+     * Obtiene datos de comparación planeado vs real por mes para gráfico de barras
+     */
+    public List<Object[]> getComparacionPlaneadoVsReal() {
+        List<Object[]> comparacion = new ArrayList<>();
+        String sql = "SELECT " +
+                    "YEAR(fecha_impacto) as año, " +
+                    "MONTH(fecha_impacto) as mes, " +
+                    "atributo_impacto, " +
+                    "SUM(impacto * multiplicador) as total " +
+                    "FROM impactos " +
+                    "WHERE atributo_impacto IN ('Planeado', 'Real') " +
+                    "AND fecha_impacto >= DATEADD(month, -6, GETDATE()) " +
+                    "GROUP BY YEAR(fecha_impacto), MONTH(fecha_impacto), atributo_impacto " +
+                    "ORDER BY año, mes, atributo_impacto";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                int año = rs.getInt("año");
+                int mes = rs.getInt("mes");
+                String atributo = rs.getString("atributo_impacto");
+                BigDecimal total = rs.getBigDecimal("total");
+                comparacion.add(new Object[]{año, mes, atributo, total});
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener comparación planeado vs real: " + e.getMessage());
+        }
+
+        return comparacion;
+    }
+
+    /**
      * Método auxiliar para crear un objeto Impacto desde ResultSet
      */
     private Impacto createImpactoFromResultSet(ResultSet rs) throws SQLException {

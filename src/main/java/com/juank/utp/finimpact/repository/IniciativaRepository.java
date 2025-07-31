@@ -246,10 +246,10 @@ public class IniciativaRepository {
     }
 
     /**
-     * Cuenta iniciativas activas
+     * Cuenta el número de iniciativas activas (en curso)
      */
     public int countIniciativasActivas() {
-        String sql = "SELECT COUNT(*) FROM iniciativas WHERE estado IN ('planeado', 'en curso')";
+        String sql = "SELECT COUNT(*) FROM iniciativas WHERE estado = 'en curso'";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -258,7 +258,6 @@ public class IniciativaRepository {
             if (rs.next()) {
                 return rs.getInt(1);
             }
-
         } catch (SQLException e) {
             System.err.println("Error al contar iniciativas activas: " + e.getMessage());
         }
