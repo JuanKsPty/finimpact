@@ -30,27 +30,53 @@
       </HBox>
    </top>
    <center>
-      <VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0" style="-fx-background-color: #ECEFF4;">
+      <StackPane prefHeight="400.0" prefWidth="600.0">
          <children>
-            <Label text="Bienvenido a FinImpact" textAlignment="CENTER">
-               <font>
-                  <Font name="System Bold" size="28.0" />
-               </font>
-            </Label>
-            <Label text="Sistema de Seguimiento de Iniciativas e Impactos Financieros" textAlignment="CENTER" textFill="#4C566A">
-               <font>
-                  <Font size="16.0" />
-               </font>
-            </Label>
+            <!-- Vista de bienvenida para usuarios no logueados -->
+            <VBox fx:id="welcomeView" alignment="CENTER" spacing="20.0" style="-fx-background-color: #ECEFF4;">
+               <children>
+                  <Label text="Bienvenido a FinImpact" textAlignment="CENTER">
+                     <font>
+                        <Font name="System Bold" size="28.0" />
+                     </font>
+                  </Label>
+                  <Label text="Sistema de Seguimiento de Iniciativas e Impactos Financieros" textAlignment="CENTER" textFill="#4C566A">
+                     <font>
+                        <Font size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+
+            <!-- TabPane para usuarios logueados -->
+            <TabPane fx:id="mainTabPane" visible="false" style="-fx-background-color: #ECEFF4;" tabClosingPolicy="UNAVAILABLE">
+               <tabs>
+                  <Tab text="Dashboard">
+                     <content>
+                        <fx:include source="dashboard-view.fxml" />
+                     </content>
+                  </Tab>
+                  <Tab text="Iniciativas">
+                     <content>
+                        <fx:include source="iniciativa-view.fxml" />
+                     </content>
+                  </Tab>
+                  <Tab text="Impactos">
+                     <content>
+                        <fx:include source="impacto-view.fxml" />
+                     </content>
+                  </Tab>
+               </tabs>
+            </TabPane>
          </children>
-      </VBox>
+      </StackPane>
    </center>
    <bottom>
       <HBox alignment="CENTER" prefHeight="40.0" style="-fx-background-color: #D8DEE9;" BorderPane.alignment="CENTER">
          <children>
             <Label fx:id="lblStatus" text="No hay usuario autenticado" textFill="#4C566A">
                <font>
-                  <Font size="12.0" />
+                  <Font size="14.0" />
                </font>
             </Label>
          </children>

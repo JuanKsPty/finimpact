@@ -1,7 +1,9 @@
 package com.juank.utp.finimpact;
 
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -15,6 +17,14 @@ public class Application extends javafx.application.Application {
         stage.setScene(scene);
         stage.setMinWidth(600);
         stage.setMinHeight(400);
+
+        // Set full screen using screen bounds
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        stage.setX(screenBounds.getMinX());
+        stage.setY(screenBounds.getMinY());
+        stage.setWidth(screenBounds.getWidth());
+        stage.setHeight(screenBounds.getHeight());
+        stage.setMaximized(true);
         stage.show();
     }
 

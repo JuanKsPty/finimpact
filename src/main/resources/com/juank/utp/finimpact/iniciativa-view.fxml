@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.juank.utp.finimpact.controller.IniciativaController">
+   <children>
+      <!-- Header -->
+      <HBox alignment="CENTER_LEFT" prefHeight="60.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D8DEE9; -fx-border-width: 0 0 1 0;">
+         <children>
+            <Label text="Gestión de Iniciativas" textFill="#2E3440">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnNuevaIniciativa" mnemonicParsing="false" onAction="#mostrarFormularioIniciativa" style="-fx-background-color: #5E81AC; -fx-text-fill: white; -fx-background-radius: 5;" text="+ Nueva Iniciativa">
+               <HBox.margin>
+                  <Insets right="20.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+
+      <!-- Filtros -->
+      <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: #ECEFF4; -fx-padding: 15;">
+         <children>
+            <Label text="Filtros:" textFill="#4C566A">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+
+            <ComboBox fx:id="cbEstado" promptText="Estado">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="Todos" />
+                     <String fx:value="planeado" />
+                     <String fx:value="en curso" />
+                     <String fx:value="finalizado" />
+                     <String fx:value="cancelado" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+
+            <ComboBox fx:id="cbRiesgo" promptText="Riesgo">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="Todos" />
+                     <String fx:value="alto" />
+                     <String fx:value="medio" />
+                     <String fx:value="bajo" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+
+            <TextField fx:id="txtFiltroNombre" prefWidth="200.0" promptText="Buscar por nombre..." />
+
+            <Button fx:id="btnLimpiarFiltros" mnemonicParsing="false" onAction="#limpiarFiltros" style="-fx-background-color: #D08770; -fx-text-fill: white; -fx-background-radius: 3;" text="Limpiar Filtros" />
+         </children>
+      </HBox>
+
+      <!-- Tabla -->
+      <TableView fx:id="tableIniciativas" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn fx:id="colId" minWidth="50.0" prefWidth="80.0" text="ID" />
+            <TableColumn fx:id="colNombre" minWidth="150.0" prefWidth="360.0" text="Nombre" />
+            <TableColumn fx:id="colDescripcion" minWidth="90.0" prefWidth="90.0" text="Descripción" />
+            <TableColumn fx:id="colTipo" minWidth="100.0" prefWidth="120.0" text="Tipo" />
+            <TableColumn fx:id="colEstado" minWidth="100.0" prefWidth="120.0" text="Estado" />
+            <TableColumn fx:id="colRiesgo" minWidth="80.0" prefWidth="100.0" text="Riesgo" />
+            <TableColumn fx:id="colFechaInicio" minWidth="100.0" prefWidth="120.0" text="Fecha Inicio" />
+            <TableColumn fx:id="colFechaFin" minWidth="100.0" prefWidth="168.0" text="Fecha Fin" />
+            <TableColumn fx:id="colAcciones" minWidth="150.0" prefWidth="153.0" text="Acciones" />
+         </columns>
+         <VBox.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />
+         </VBox.margin>
+      </TableView>
+   </children>
+</VBox>

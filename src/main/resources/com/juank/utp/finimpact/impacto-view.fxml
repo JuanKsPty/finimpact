@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.collections.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.juank.utp.finimpact.controller.ImpactoController">
+   <children>
+      <!-- Header -->
+      <HBox alignment="CENTER_LEFT" prefHeight="60.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D8DEE9; -fx-border-width: 0 0 1 0;">
+         <children>
+            <Label text="Gestión de Impactos" textFill="#2E3440">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+               <HBox.margin>
+                  <Insets left="20.0" />
+               </HBox.margin>
+            </Label>
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="btnNuevoImpacto" mnemonicParsing="false" onAction="#mostrarFormularioImpacto" style="-fx-background-color: #5E81AC; -fx-text-fill: white; -fx-background-radius: 5;" text="+ Nuevo Impacto">
+               <HBox.margin>
+                  <Insets right="20.0" />
+               </HBox.margin>
+            </Button>
+         </children>
+      </HBox>
+
+      <!-- Filtros -->
+      <HBox alignment="CENTER_LEFT" spacing="15.0" style="-fx-background-color: #ECEFF4; -fx-padding: 15;">
+         <children>
+            <Label text="Filtros:" textFill="#4C566A">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+
+            <ComboBox fx:id="cbTipo" promptText="Tipo">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="Todos" />
+                     <String fx:value="Maquinaria" />
+                     <String fx:value="Generación" />
+                     <String fx:value="Optimización" />
+                     <String fx:value="Transformación" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+
+            <ComboBox fx:id="cbSeveridad" promptText="Atributo">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="Todos" />
+                     <String fx:value="Planeado" />
+                     <String fx:value="Estimado" />
+                     <String fx:value="Real" />
+                  </FXCollections>
+               </items>
+            </ComboBox>
+
+            <TextField fx:id="txtFiltroDescripcion" prefWidth="200.0" promptText="Buscar por tipo..." />
+
+            <Button fx:id="btnLimpiarFiltros" mnemonicParsing="false" onAction="#limpiarFiltros" style="-fx-background-color: #D08770; -fx-text-fill: white; -fx-background-radius: 3;" text="Limpiar Filtros" />
+         </children>
+      </HBox>
+
+      <!-- Tabla de Impactos -->
+      <TableView fx:id="tableImpactos" VBox.vgrow="ALWAYS">
+         <columns>
+            <TableColumn fx:id="colId" prefWidth="60.0" text="ID" />
+            <TableColumn fx:id="colDescripcion" prefWidth="143.0" text="Descripción" />
+            <TableColumn fx:id="colTipo" prefWidth="158.0" text="Tipo" />
+            <TableColumn fx:id="colSeveridad" prefWidth="130.0" text="Severidad" />
+            <TableColumn fx:id="colValorMonetario" prefWidth="159.0" text="Valor Monetario" />
+            <TableColumn fx:id="colFechaDeteccion" prefWidth="107.0" text="F. Detección" />
+            <TableColumn fx:id="colIniciativaId" prefWidth="300.0" text="Iniciativa" />
+            <TableColumn fx:id="colAcciones" prefWidth="200.0" text="Acciones" />
+         </columns>
+      </TableView>
+   </children>
+</VBox>

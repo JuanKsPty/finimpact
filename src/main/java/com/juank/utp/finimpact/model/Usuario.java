@@ -34,6 +34,14 @@ public class Usuario {
     }
 
     // Getters y Setters
+    public int getId() {
+        return idUsuario;
+    }
+
+    public void setId(int id) {
+        this.idUsuario = id;
+    }
+
     public int getIdUsuario() {
         return idUsuario;
     }
@@ -84,12 +92,6 @@ public class Usuario {
 
     @Override
     public String toString() {
-        return "Usuario{" +
-                "idUsuario=" + idUsuario +
-                ", nombreCompleto='" + nombreCompleto + '\'' +
-                ", email='" + email + '\'' +
-                ", rol='" + rol + '\'' +
-                ", estado=" + estado +
-                '}';
+        return nombreCompleto;
     }
 }

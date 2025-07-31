@@ -51,6 +51,14 @@ public class Iniciativa {
     }
 
     // Getters y Setters
+    public int getId() {
+        return idIniciativa;
+    }
+
+    public void setId(int id) {
+        this.idIniciativa = id;
+    }
+
     public int getIdIniciativa() {
         return idIniciativa;
     }
@@ -115,6 +123,14 @@ public class Iniciativa {
         this.riesgo = riesgo;
     }
 
+    public int getUsuarioId() {
+        return idOwner;
+    }
+
+    public void setUsuarioId(int usuarioId) {
+        this.idOwner = usuarioId;
+    }
+
     public int getIdOwner() {
         return idOwner;
     }
@@ -133,17 +149,6 @@ public class Iniciativa {
 
     @Override
     public String toString() {
-        return "Iniciativa{" +
-                "idIniciativa=" + idIniciativa +
-                ", nombre='" + nombre + '\'' +
-                ", descripcion='" + descripcion + '\'' +
-                ", fechaInicio=" + fechaInicio +
-                ", fechaFin=" + fechaFin +
-                ", tipo='" + tipo + '\'' +
-                ", estado='" + estado + '\'' +
-                ", riesgo='" + riesgo + '\'' +
-                ", idOwner=" + idOwner +
-                ", fechaRegistro=" + fechaRegistro +
-                '}';
+        return nombre;
     }
 }

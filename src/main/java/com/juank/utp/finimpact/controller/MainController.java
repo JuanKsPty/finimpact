@@ -6,6 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TabPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
@@ -21,6 +23,12 @@ public class MainController {
 
     @FXML
     private Label lblStatus;
+
+    @FXML
+    private VBox welcomeView;
+
+    @FXML
+    private TabPane mainTabPane;
 
     private Usuario usuarioLogueado;
 
@@ -96,11 +104,19 @@ public class MainController {
             btnLogin.setText("Login");
             lblStatus.setText("No hay usuario autenticado");
             btnLogin.setStyle("-fx-background-color: #5E81AC; -fx-text-fill: white; -fx-background-radius: 5;");
+
+            // Mostrar vista de bienvenida y ocultar TabPane
+            welcomeView.setVisible(true);
+            mainTabPane.setVisible(false);
         } else {
             btnLogin.setText("Logout");
             lblStatus.setText("Conectado como: " + usuarioLogueado.getNombreCompleto() + " (" +
                             getRolDisplayName(usuarioLogueado.getRol()) + ")");
             btnLogin.setStyle("-fx-background-color: #D08770; -fx-text-fill: white; -fx-background-radius: 5;");
+
+            // Ocultar vista de bienvenida y mostrar TabPane
+            welcomeView.setVisible(false);
+            mainTabPane.setVisible(true);
         }
     }
 
