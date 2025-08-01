@@ -62,11 +62,11 @@ public class UsuarioRepository {
     }
 
     /**
-     * Obtiene todos los usuarios
+     * Obtiene todos los usuarios activos
      */
     public List<Usuario> findAll() {
         List<Usuario> usuarios = new ArrayList<>();
-        String sql = "SELECT id_usuario, nombre_completo, email, password, rol, estado FROM usuarios ORDER BY nombre_completo";
+        String sql = "SELECT id_usuario, nombre_completo, email, password, rol, estado FROM usuarios WHERE estado = 1 ORDER BY nombre_completo";
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
@@ -273,5 +273,26 @@ public class UsuarioRepository {
         }
 
         return usuarios;
+    }
+
+    /**
+     * Actualiza solo el estado de un usuario
+     */
+    public boolean updateEstado(int idUsuario, boolean estado) {
+        String sql = "UPDATE usuarios SET estado = ? WHERE id_usuario = ?";
+
+        try (Connection conn = DatabaseConfig.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setBoolean(1, estado);
+            stmt.setInt(2, idUsuario);
+
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            System.err.println("Error al actualizar estado del usuario: " + e.getMessage());
+        }
+
+        return false;
     }
 }

@@ -34,6 +34,7 @@ public class UsuarioController implements Initializable {
     @FXML private TableColumn<Usuario, String> colUsuario;
     @FXML private TableColumn<Usuario, String> colEmail;
     @FXML private TableColumn<Usuario, String> colTipo;
+    @FXML private TableColumn<Usuario, String> colEstado;
     @FXML private TableColumn<Usuario, Void> colAcciones;
 
     // Repositorio
@@ -60,6 +61,7 @@ public class UsuarioController implements Initializable {
         colUsuario.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail())); // Usando email como usuario
         colEmail.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getEmail()));
         colTipo.setCellValueFactory(cellData -> new SimpleStringProperty(getTipoDisplayName(cellData.getValue().getRol())));
+        colEstado.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().isEstado() ? "Activo" : "Inactivo"));
 
         // Configurar columna de acciones
         colAcciones.setCellFactory(param -> new TableCell<>() {
@@ -68,12 +70,13 @@ public class UsuarioController implements Initializable {
             private final HBox pane = new HBox(8);
 
             {
-                // Hacer los botones más grandes
+                // Configurar tamaños de botones
                 btnEditar.setPrefWidth(80);
                 btnEditar.setPrefHeight(35);
                 btnEliminar.setPrefWidth(80);
                 btnEliminar.setPrefHeight(35);
 
+                // Estilos de botones
                 btnEditar.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 12px; -fx-font-weight: bold;");
                 btnEliminar.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-background-radius: 5; -fx-font-size: 12px; -fx-font-weight: bold;");
 
@@ -144,10 +147,23 @@ public class UsuarioController implements Initializable {
 
     private void cargarUsuarios() {
         try {
+            System.out.println("🔄 Recargando lista de usuarios...");
             List<Usuario> usuarios = usuarioRepository.findAll();
+            System.out.println("📊 Usuarios encontrados: " + usuarios.size());
+
+            usuariosList.clear();
             usuariosList.setAll(usuarios);
+
+            usuariosFiltradosList.clear();
             usuariosFiltradosList.setAll(usuarios);
+
+            // Forzar refresh de la tabla
+            tableUsuarios.refresh();
+
+            System.out.println("✅ Tabla de usuarios actualizada");
         } catch (Exception e) {
+            System.err.println("❌ Error al cargar usuarios: " + e.getMessage());
+            e.printStackTrace();
             mostrarError("Error al cargar usuarios", e.getMessage());
         }
     }
@@ -165,11 +181,55 @@ public class UsuarioController implements Initializable {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
-                usuarioRepository.delete(usuario.getId());
-                cargarUsuarios();
-                mostrarInformacion("Éxito", "Usuario eliminado correctamente.");
+                boolean eliminado = usuarioRepository.delete(usuario.getId());
+                if (eliminado) {
+                    cargarUsuarios();
+                    mostrarInformacion("Éxito", "Usuario eliminado correctamente.");
+                } else {
+                    mostrarError("Error", "No se pudo eliminar el usuario.");
+                }
             } catch (Exception e) {
                 mostrarError("Error al eliminar usuario", e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Cambia el estado activo/inactivo de un usuario
+     */
+    private void cambiarEstadoUsuario(Usuario usuario) {
+        String accion = usuario.isEstado() ? "desactivar" : "activar";
+        String mensaje = usuario.isEstado() ?
+            "¿Está seguro de desactivar este usuario? No podrá iniciar sesión." :
+            "¿Está seguro de activar este usuario? Podrá iniciar sesión nuevamente.";
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmar cambio de estado");
+        alert.setHeaderText("¿Cambiar estado del usuario?");
+        alert.setContentText(mensaje);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                // Cambiar el estado del usuario
+                usuario.setEstado(!usuario.isEstado());
+                boolean actualizado = usuarioRepository.updateEstado(usuario.getId(), usuario.isEstado());
+
+                if (actualizado) {
+                    cargarUsuarios(); // Recargar la tabla para mostrar los cambios
+                    String estadoTexto = usuario.isEstado() ? "activado" : "desactivado";
+                    mostrarInformacion("Éxito", "Usuario " + estadoTexto + " correctamente.");
+                } else {
+                    // Revertir el cambio si falló la actualización
+                    usuario.setEstado(!usuario.isEstado());
+                    mostrarError("Error", "No se pudo cambiar el estado del usuario.");
+                }
+            } catch (Exception e) {
+                // Revertir el cambio si hubo excepción
+                usuario.setEstado(!usuario.isEstado());
+                mostrarError("Error al cambiar estado", e.getMessage());
+                e.printStackTrace();
             }
         }
     }

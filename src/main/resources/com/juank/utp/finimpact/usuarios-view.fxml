@@ -67,7 +67,8 @@
             <TableColumn fx:id="colUsuario" minWidth="150.0" prefWidth="180.0" text="Usuario" />
             <TableColumn fx:id="colEmail" minWidth="200.0" prefWidth="250.0" text="Email" />
             <TableColumn fx:id="colTipo" minWidth="100.0" prefWidth="120.0" text="Tipo" />
-            <TableColumn fx:id="colAcciones" minWidth="150.0" prefWidth="200.0" text="Acciones" />
+            <TableColumn fx:id="colEstado" minWidth="80.0" prefWidth="100.0" text="Estado" />
+            <TableColumn fx:id="colAcciones" minWidth="200.0" prefWidth="280.0" text="Acciones" />
          </columns>
          <VBox.margin>
             <Insets bottom="20.0" left="20.0" right="20.0" top="10.0" />

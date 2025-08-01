@@ -314,9 +314,9 @@ public class MainController {
             usuariosStage.setTitle("Gestión de Usuarios - FinImpact");
             usuariosStage.setScene(scene);
             usuariosStage.initModality(Modality.APPLICATION_MODAL);
-            usuariosStage.setWidth(1200);
+            usuariosStage.setWidth(1400);
             usuariosStage.setHeight(800);
-            usuariosStage.setMinWidth(1200);
+            usuariosStage.setMinWidth(1400);
             usuariosStage.setMinHeight(800);
             usuariosStage.centerOnScreen();
             usuariosStage.showAndWait();
