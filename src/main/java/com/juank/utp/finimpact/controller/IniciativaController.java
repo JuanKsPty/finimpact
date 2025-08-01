@@ -5,6 +5,7 @@ import com.juank.utp.finimpact.model.Usuario;
 import com.juank.utp.finimpact.repository.IniciativaRepository;
 import com.juank.utp.finimpact.repository.UsuarioRepository;
 import com.juank.utp.finimpact.utils.UserSession;
+import com.juank.utp.finimpact.utils.AsyncTaskManager;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -18,6 +19,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.application.Platform;
 
 import java.net.URL;
 import java.time.LocalDate;
@@ -242,6 +244,55 @@ public class IniciativaController implements Initializable {
         } catch (Exception e) {
             mostrarError("Error al cargar iniciativas", e.getMessage());
         }
+    }
+
+    /**
+     * Método asíncrono para recargar iniciativas según el usuario actual
+     */
+    public void cargarIniciativasAsync() {
+        // Mostrar indicador de carga en la tabla
+        Platform.runLater(() -> {
+            tableIniciativas.setPlaceholder(new Label("Cargando iniciativas..."));
+        });
+
+        AsyncTaskManager.executeAsyncWithMessage(
+            () -> {
+                // Esta operación se ejecuta en background thread
+                Usuario usuarioActual = UserSession.getUsuarioActual();
+                List<Iniciativa> iniciativas;
+
+                if (usuarioActual != null && "analista".equals(usuarioActual.getRol())) {
+                    // Para analistas: solo cargar sus iniciativas asignadas
+                    iniciativas = iniciativaRepository.findByOwner(usuarioActual.getIdUsuario());
+                    System.out.println("🔍 Cargando iniciativas del analista: " + usuarioActual.getNombreCompleto() + " (" + iniciativas.size() + " iniciativas)");
+                } else {
+                    // Para admin y viewer: cargar todas las iniciativas
+                    iniciativas = iniciativaRepository.findAll();
+                    System.out.println("🔍 Cargando todas las iniciativas para " + (usuarioActual != null ? usuarioActual.getRol() : "usuario") + " (" + iniciativas.size() + " iniciativas)");
+                }
+
+                return iniciativas;
+            },
+            (iniciativas) -> {
+                // Este código se ejecuta en el UI thread después del éxito
+                iniciativasList.setAll(iniciativas);
+                iniciativasFiltradasList.setAll(iniciativas);
+                tableIniciativas.setPlaceholder(new Label("No hay iniciativas disponibles"));
+                System.out.println("✅ Iniciativas cargadas correctamente de forma asíncrona");
+            },
+            (error) -> {
+                // En caso de error
+                System.err.println("❌ Error al cargar iniciativas: " + error.getMessage());
+                Platform.runLater(() -> {
+                    tableIniciativas.setPlaceholder(new Label("Error al cargar iniciativas"));
+                    mostrarError("Error al cargar iniciativas", error.getMessage());
+                });
+            },
+            null, // No hay ProgressIndicator específico
+            null, // No hay Label de status específico
+            "Cargando iniciativas...",
+            "Iniciativas cargadas correctamente"
+        );
     }
 
     private void editarIniciativa(Iniciativa iniciativa) {

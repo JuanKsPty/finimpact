@@ -5,6 +5,7 @@ import com.juank.utp.finimpact.model.Iniciativa;
 import com.juank.utp.finimpact.repository.ImpactoRepository;
 import com.juank.utp.finimpact.repository.IniciativaRepository;
 import com.juank.utp.finimpact.utils.UserSession;
+import com.juank.utp.finimpact.utils.AsyncTaskManager;
 import com.juank.utp.finimpact.model.Usuario;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -19,6 +20,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.application.Platform;
 
 import java.math.BigDecimal;
 import java.net.URL;
@@ -260,6 +262,55 @@ public class ImpactoController implements Initializable {
         } catch (Exception e) {
             mostrarError("Error al cargar impactos", e.getMessage());
         }
+    }
+
+    /**
+     * Método asíncrono para recargar impactos según el usuario actual
+     */
+    public void cargarImpactosAsync() {
+        // Mostrar indicador de carga en la tabla
+        Platform.runLater(() -> {
+            tableImpactos.setPlaceholder(new Label("Cargando impactos..."));
+        });
+
+        AsyncTaskManager.executeAsyncWithMessage(
+            () -> {
+                // Esta operación se ejecuta en background thread
+                Usuario usuarioActual = UserSession.getUsuarioActual();
+                List<Impacto> impactos;
+
+                if (usuarioActual != null && "analista".equals(usuarioActual.getRol())) {
+                    // Para analistas: solo cargar impactos relacionados a sus iniciativas
+                    impactos = impactoRepository.findByOwner(usuarioActual.getIdUsuario());
+                    System.out.println("🔍 Cargando impactos del analista: " + usuarioActual.getNombreCompleto() + " (" + impactos.size() + " impactos)");
+                } else {
+                    // Para admin y viewer: cargar todos los impactos
+                    impactos = impactoRepository.findAll();
+                    System.out.println("🔍 Cargando todos los impactos para " + (usuarioActual != null ? usuarioActual.getRol() : "usuario") + " (" + impactos.size() + " impactos)");
+                }
+
+                return impactos;
+            },
+            (impactos) -> {
+                // Este código se ejecuta en el UI thread después del éxito
+                impactosList.setAll(impactos);
+                impactosFiltradosList.setAll(impactos);
+                tableImpactos.setPlaceholder(new Label("No hay impactos disponibles"));
+                System.out.println("✅ Impactos cargados correctamente de forma asíncrona");
+            },
+            (error) -> {
+                // En caso de error
+                System.err.println("❌ Error al cargar impactos: " + error.getMessage());
+                Platform.runLater(() -> {
+                    tableImpactos.setPlaceholder(new Label("Error al cargar impactos"));
+                    mostrarError("Error al cargar impactos", error.getMessage());
+                });
+            },
+            null, // No hay ProgressIndicator específico
+            null, // No hay Label de status específico
+            "Cargando impactos...",
+            "Impactos cargados correctamente"
+        );
     }
 
     private void editarImpacto(Impacto impacto) {

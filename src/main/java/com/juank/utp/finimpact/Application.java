@@ -1,5 +1,7 @@
 package com.juank.utp.finimpact;
 
+import com.juank.utp.finimpact.utils.AsyncTaskManager;
+import com.juank.utp.finimpact.utils.DatabaseConfig;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
@@ -25,6 +27,17 @@ public class Application extends javafx.application.Application {
         stage.setWidth(screenBounds.getWidth());
         stage.setHeight(screenBounds.getHeight());
         stage.setMaximized(true);
+
+        // Configurar el cierre de la aplicación para limpiar recursos
+        stage.setOnCloseRequest(event -> {
+            System.out.println("🔒 Cerrando aplicación y limpiando recursos...");
+            // Cerrar pool de conexiones
+            DatabaseConfig.closePool();
+            // Cerrar executor de tareas asíncronas
+            AsyncTaskManager.shutdown();
+            System.out.println("✅ Recursos limpiados correctamente");
+        });
+
         stage.show();
     }
 

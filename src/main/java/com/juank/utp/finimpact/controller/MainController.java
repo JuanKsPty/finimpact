@@ -2,15 +2,18 @@ package com.juank.utp.finimpact.controller;
 
 import com.juank.utp.finimpact.model.Usuario;
 import com.juank.utp.finimpact.utils.UserSession;
+import com.juank.utp.finimpact.utils.AsyncTaskManager;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.application.Platform;
 
 import java.io.IOException;
 
@@ -122,8 +125,35 @@ public class MainController {
         UserSession.setUsuarioActual(usuario);
         actualizarEstadoUsuario();
 
-        // Reconfigurar el dashboard con el nuevo usuario
-        reconfigurarDashboard();
+        // Mostrar mensaje de carga
+        lblStatus.setText("Configurando aplicación para " + usuario.getNombreCompleto() + "...");
+
+        // Reconfigurar de forma asíncrona para evitar bloqueos
+        AsyncTaskManager.executeAsyncWithMessage(
+            () -> {
+                // Simular configuración (esto se ejecuta en background)
+                try {
+                    Thread.sleep(500); // Pequeña pausa para mostrar el indicador
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+                return "Configuración completada";
+            },
+            (result) -> {
+                // Este código se ejecuta en el UI thread después del éxito
+                reconfigurarDashboard();
+                lblStatus.setText("Conectado como: " + usuario.getNombreCompleto() + " (" + getRolDisplayName(usuario.getRol()) + ")");
+            },
+            (error) -> {
+                // En caso de error
+                System.err.println("Error configurando usuario: " + error.getMessage());
+                lblStatus.setText("Error al configurar usuario");
+            },
+            null, // No hay ProgressIndicator en este caso
+            lblStatus,
+            "Configurando aplicación para " + usuario.getNombreCompleto() + "...",
+            "Configuración completada"
+        );
 
         System.out.println("✅ Usuario logueado: " + usuario.getNombreCompleto() + " (" + usuario.getRol() + ")");
     }
@@ -132,81 +162,76 @@ public class MainController {
      * Reconfigura el dashboard cuando cambia el usuario
      */
     private void reconfigurarDashboard() {
-        // Simular clic en la pestaña del dashboard para forzar reconfiguración
-        if (mainTabPane != null && mainTabPane.getTabs().size() > 0) {
-            // Forzar recarga del dashboard
-            System.out.println("🔄 Reconfigurando dashboard para el nuevo usuario...");
+        // Forzar recarga del dashboard
+        System.out.println("🔄 Reconfigurando dashboard para el nuevo usuario...");
 
-            // Ejecutar en el siguiente ciclo del JavaFX Application Thread
-            javafx.application.Platform.runLater(() -> {
-                try {
-                    // Intentar encontrar y reconfigurar el dashboard
-                    configurarDashboardConUsuario();
-                } catch (Exception e) {
-                    System.err.println("Error al reconfigurar dashboard: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            });
-        }
+        // Configurar controladores de forma secuencial y asíncrona
+        Platform.runLater(() -> {
+            configurarControladores();
+        });
     }
 
     /**
-     * Configura el dashboard con el usuario actual
+     * Configura los controladores de forma asíncrona y secuencial
      */
-    private void configurarDashboardConUsuario() {
-        System.out.println("🔧 Configurando dashboard con usuario actual...");
-
+    private void configurarControladores() {
+        // Configurar dashboard
         if (dashboardIncludeController != null && usuarioLogueado != null) {
             System.out.println("📊 Estableciendo usuario en DashboardController...");
             dashboardIncludeController.setUsuarioLogueado(usuarioLogueado);
-        } else {
-            System.out.println("⚠️ DashboardController es null: " + (dashboardIncludeController == null) +
-                             ", Usuario es null: " + (usuarioLogueado == null));
-
-            // Si el controlador no está disponible, intentar reconfigurar desde UserSession
-            if (usuarioLogueado != null) {
-                System.out.println("🔄 Intentando reconfiguración alternativa...");
-                // La reconfiguración se hará automáticamente cuando el dashboard detecte
-                // cambios en UserSession en el siguiente acceso
-            }
         }
 
-        // También configurar otros controladores si es necesario
+        // Configurar iniciativas de forma asíncrona
         if (iniciativaIncludeController != null && usuarioLogueado != null) {
-            // Reconfigurar el controlador de iniciativas
             System.out.println("📋 Reconfigurando IniciativaController para usuario: " + usuarioLogueado.getRol());
-            // Forzar recarga de datos en IniciativaController
-            javafx.application.Platform.runLater(() -> {
-                try {
-                    // Si el controlador tiene un método para recargar datos, llamarlo
-                    iniciativaIncludeController.configurarPermisosSegunUsuario();
-                    iniciativaIncludeController.cargarIniciativas();
-                } catch (Exception e) {
-                    System.err.println("Error al reconfigurar IniciativaController: " + e.getMessage());
+
+            AsyncTaskManager.executeAsync(
+                () -> {
+                    // Configurar permisos en background
+                    return "Iniciativas configuradas";
+                },
+                (result) -> {
+                    // Configurar en UI thread
+                    try {
+                        iniciativaIncludeController.configurarPermisosSegunUsuario();
+                        // Cargar datos de forma asíncrona
+                        iniciativaIncludeController.cargarIniciativasAsync();
+                    } catch (Exception e) {
+                        System.err.println("Error configurando IniciativaController: " + e.getMessage());
+                    }
+                },
+                (error) -> {
+                    System.err.println("Error al reconfigurar IniciativaController: " + error.getMessage());
                 }
-            });
-        } else {
-            System.out.println("⚠️ IniciativaController es null: " + (iniciativaIncludeController == null));
+            );
         }
 
+        // Configurar impactos de forma asíncrona
         if (impactoIncludeController != null && usuarioLogueado != null) {
-            // Reconfigurar el controlador de impactos
             System.out.println("💰 Reconfigurando ImpactoController para usuario: " + usuarioLogueado.getRol());
-            // Forzar recarga de datos en ImpactoController
-            javafx.application.Platform.runLater(() -> {
-                try {
-                    // Si el controlador tiene un método para recargar datos, llamarlo
-                    impactoIncludeController.configurarPermisosSegunUsuario();
-                    impactoIncludeController.cargarImpactos();
-                } catch (Exception e) {
-                    System.err.println("Error al reconfigurar ImpactoController: " + e.getMessage());
+
+            AsyncTaskManager.executeAsync(
+                () -> {
+                    // Configurar permisos en background
+                    return "Impactos configurados";
+                },
+                (result) -> {
+                    // Configurar en UI thread
+                    try {
+                        impactoIncludeController.configurarPermisosSegunUsuario();
+                        // Cargar datos de forma asíncrona
+                        impactoIncludeController.cargarImpactosAsync();
+                    } catch (Exception e) {
+                        System.err.println("Error configurando ImpactoController: " + e.getMessage());
+                    }
+                },
+                (error) -> {
+                    System.err.println("Error al reconfigurar ImpactoController: " + error.getMessage());
                 }
-            });
-        } else {
-            System.out.println("⚠️ ImpactoController es null: " + (impactoIncludeController == null));
+            );
         }
 
-        System.out.println("✅ Dashboard configurado para recargar con nuevo usuario");
+        System.out.println("✅ Controladores configurados para recargar con nuevo usuario");
     }
 
     /**
