@@ -133,7 +133,12 @@ public class UsuarioRepository {
 
             stmt.setString(1, usuario.getNombreCompleto());
             stmt.setString(2, usuario.getEmail());
-            stmt.setString(3, PasswordUtils.hashPassword(usuario.getPassword()));
+            // Hash la contraseña solo si no está ya hasheada
+            String passwordToSave = usuario.getPassword();
+            if (!passwordToSave.startsWith("$2a$")) { // BCrypt hash starts with $2a$
+                passwordToSave = PasswordUtils.hashPassword(passwordToSave);
+            }
+            stmt.setString(3, passwordToSave);
             stmt.setString(4, usuario.getRol());
             stmt.setBoolean(5, usuario.isEstado());
 
@@ -158,16 +163,35 @@ public class UsuarioRepository {
      * Actualiza un usuario existente
      */
     public boolean update(Usuario usuario) {
-        String sql = "UPDATE usuarios SET nombre_completo = ?, email = ?, rol = ?, estado = ? WHERE id_usuario = ?";
+        // Si el usuario tiene una nueva contraseña, incluirla en la actualización
+        String sql;
+        if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
+            sql = "UPDATE usuarios SET nombre_completo = ?, email = ?, password = ?, rol = ?, estado = ? WHERE id_usuario = ?";
+        } else {
+            sql = "UPDATE usuarios SET nombre_completo = ?, email = ?, rol = ?, estado = ? WHERE id_usuario = ?";
+        }
 
         try (Connection conn = DatabaseConfig.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, usuario.getNombreCompleto());
             stmt.setString(2, usuario.getEmail());
-            stmt.setString(3, usuario.getRol());
-            stmt.setBoolean(4, usuario.isEstado());
-            stmt.setInt(5, usuario.getIdUsuario());
+
+            if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
+                // Hash la contraseña solo si no está ya hasheada
+                String passwordToSave = usuario.getPassword();
+                if (!passwordToSave.startsWith("$2a$")) { // BCrypt hash starts with $2a$
+                    passwordToSave = PasswordUtils.hashPassword(passwordToSave);
+                }
+                stmt.setString(3, passwordToSave);
+                stmt.setString(4, usuario.getRol());
+                stmt.setBoolean(5, usuario.isEstado());
+                stmt.setInt(6, usuario.getIdUsuario());
+            } else {
+                stmt.setString(3, usuario.getRol());
+                stmt.setBoolean(4, usuario.isEstado());
+                stmt.setInt(5, usuario.getIdUsuario());
+            }
 
             return stmt.executeUpdate() > 0;
 

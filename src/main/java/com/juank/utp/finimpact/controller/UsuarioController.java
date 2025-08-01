@@ -2,7 +2,6 @@ package com.juank.utp.finimpact.controller;
 
 import com.juank.utp.finimpact.model.Usuario;
 import com.juank.utp.finimpact.repository.UsuarioRepository;
-import com.juank.utp.finimpact.utils.PasswordUtils;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -268,8 +267,11 @@ public class UsuarioController implements Initializable {
 
                     // Solo cambiar contraseña si se ingresó una nueva
                     if (!txtPassword.getText().trim().isEmpty()) {
-                        String hashedPassword = PasswordUtils.hashPassword(txtPassword.getText().trim());
-                        nuevoUsuario.setPassword(hashedPassword);
+                        // No hashear aquí, se hace en el repositorio
+                        nuevoUsuario.setPassword(txtPassword.getText().trim());
+                    } else if (usuario != null) {
+                        // Para edición, mantener la contraseña existente sin cambios
+                        nuevoUsuario.setPassword(null); // Esto indica que no se debe actualizar la contraseña
                     }
 
                     if (usuario == null) {

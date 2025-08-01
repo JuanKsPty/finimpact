@@ -314,10 +314,10 @@ public class MainController {
             usuariosStage.setTitle("Gestión de Usuarios - FinImpact");
             usuariosStage.setScene(scene);
             usuariosStage.initModality(Modality.APPLICATION_MODAL);
-            usuariosStage.setWidth(900);
-            usuariosStage.setHeight(700);
-            usuariosStage.setMinWidth(900);
-            usuariosStage.setMinHeight(700);
+            usuariosStage.setWidth(1200);
+            usuariosStage.setHeight(800);
+            usuariosStage.setMinWidth(1200);
+            usuariosStage.setMinHeight(800);
             usuariosStage.centerOnScreen();
             usuariosStage.showAndWait();
 
@@ -340,9 +340,9 @@ public class MainController {
             perfilStage.setScene(scene);
             perfilStage.initModality(Modality.APPLICATION_MODAL);
             perfilStage.setWidth(600);
-            perfilStage.setHeight(500);
+            perfilStage.setHeight(600);
             perfilStage.setMinWidth(600);
-            perfilStage.setMinHeight(500);
+            perfilStage.setMinHeight(600);
             perfilStage.centerOnScreen();
 
             // Pasar el usuario actual al controlador del perfil

@@ -92,8 +92,8 @@ public class PerfilController {
 
         // Cambiar contraseña
         try {
-            String nuevaPasswordHash = PasswordUtils.hashPassword(passwordNueva);
-            usuario.setPassword(nuevaPasswordHash);
+            // No hashear aquí, se hace en el repositorio
+            usuario.setPassword(passwordNueva);
             usuarioRepository.update(usuario);
 
             mostrarInformacion("Éxito", "Contraseña cambiada correctamente.");

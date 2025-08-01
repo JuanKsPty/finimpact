@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<VBox prefHeight="602.0" prefWidth="630.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.juank.utp.finimpact.controller.PerfilController">
+<VBox prefHeight="630.0" prefWidth="630.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.juank.utp.finimpact.controller.PerfilController">
    <children>
       <!-- Header -->
       <HBox alignment="CENTER_LEFT" prefHeight="60.0" style="-fx-background-color: #FFFFFF; -fx-border-color: #D8DEE9; -fx-border-width: 0 0 1 0;">
@@ -24,7 +24,7 @@
       <!-- Contenido del perfil -->
       <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS">
          <content>
-            <VBox spacing="20.0" style="-fx-padding: 30;">
+            <VBox prefHeight="625.0" prefWidth="614.0" spacing="20.0" style="-fx-padding: 30;">
                <children>
                   <!-- Información personal -->
                   <VBox spacing="15.0">
